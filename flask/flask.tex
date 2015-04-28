@@ -346,14 +346,84 @@ part, as seen in section \ref{sec:auth}.
 \subsubsection{Relationships}
 \label{sec:relationships}
 
+Relationships 
+
 \subsubsection{One-To-Many}
 \label{sec:onetomany}
+
+\begin{lstlisting}
+from app import db
+from app.data import CRUDMixin
+
+class Post(db.Model, CRUDMixin):
+    __tablename__ = 'post'
+
+    content = db.Column(db.String)
+    time = db.Column(db.Date)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+\end{lstlisting}
 
 \subsubsection{Many-To-Many (Association Object)}
 \label{sec:manytomany}
 
+\begin{lstlisting}
+from app import db
+from app.data import CRUDMixin
+from app.models import User
+
+class Follow(db.Model, CRUDMixin):
+    """
+    a follows b
+    """
+    __tablename__ = 'follow'
+    a_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    b_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+
+    following_since = db.Column(db.Date, nullable=False, default=db.func.now())
+
+    # issue: http://stackoverflow.com/questions/18807322/sqlalchemy-foreign-key-relationship-attributes
+    a = db.relationship(User, foreign_keys="Follow.a_id")
+    b = db.relationship(User, foreign_keys="Follow.b_id")
+\end{lstlisting}
+
 \subsubsection{Inheritance}
 \label{sec:inheritance}
+
+Some exampolos: 
+
+\begin{lstlisting}
+from app import db
+from app.data import CRUDMixin
+
+class SocialMediaAccount(db.Model, CRUDMixin):
+    __tablename__ = 'smaccount'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    discriminator = db.Column(db.Integer)
+    __mapper_args__ = {'polymorphic_on': discriminator}  
+\end{lstlisting}
+
+\begin{lstlisting}
+class FacebookAccount(SocialMediaAccount):
+    __tablename__ = 'fbaccount'
+    __mapper_args__ = {'polymorphic_identity': 'fb_account'}
+
+    id = db.Column(db.Integer, db.ForeignKey('smaccount.id'), primary_key=True)
+    url = db.Column(db.String)
+\end{lstlisting}
+
+
+\begin{lstlisting}
+from app import db
+from app.models import SocialMediaAccount
+
+class TwitterAccount(SocialMediaAccount):
+    __tablename__ = 'twitteraccount'
+    __mapper_args__ = {'polymorphic_identity': 'tw_account'}
+
+    id = db.Column(db.Integer, db.ForeignKey('smaccount.id'), primary_key=True)
+    username = db.Column(db.String)  
+\end{lstlisting}
 
 \subsection{Authentication and Authorization (Login)}
 \label{sec:auth}

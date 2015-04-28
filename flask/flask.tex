@@ -316,6 +316,31 @@ class User(db.Model, UserMixin, CRUDMixin):
         return "<User #{:d}>".format(self.id)
 \end{lstlisting}
 
+We do not consider \lstinline|UserMixin|, which is a class used for
+authentication, as we will rather focus on the so famous
+\lstinline|db.Model| and the \lstinline|CRUDMixin| class that we have
+just declared.
+
+There are some crucial facts that must be listed down: 
+\begin{itemize}
+  \item \lstinline|__tablename__| is the tablename that we will also
+    find in the database. Having this attribute is
+    \textbf{obligatory}. 
+  \item Normally, every table must also have a primary key, however,
+    by inheriting from the convenient \lstinline|CRUDMixin| class, we
+    also inherit a very common \lstinline|id| primary key. 
+\end{itemize}
+
+We will come back to this code later on, as there are some undiscussed
+methods which are more useful for the authentication and authorization
+part, as seen in section \ref{sec:auth}. Hey, that's the next one!
+
+\subsection{Authentication and Authorization (Login)}
+\label{sec:auth}
+
+In this section we will discuss how to setup a simple login system
+with the \lstinline|Flask-Login| module. 
+
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}
 

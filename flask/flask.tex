@@ -85,6 +85,16 @@ template/
   index.html
 \end{lstlisting}
 
+This idea did not came out of the thin air, however, the developer of
+Flask has unofficially suggested \cite{mitsuhiko:flask} this particular structure, which
+actually makes sense on a second look. This structure is intended for
+middle sized projects, such as the one that will be given in the FT
+Matura. 
+
+\subsubsection{\lstinline|run.py|}
+
+\subsubsection{config.py}
+
 \begin{lstlisting}
 from os.path import join, dirname, abspath
 
@@ -96,7 +106,8 @@ class BaseConfiguration(object):
     SQLALCHEMY_ECHO = True
 \end{lstlisting}
 
-
-
+\bibliographystyle{ieeetr}
+\bibliography{../primary}
+% \ifcsdef{mainfile}{}{\bibliography{../primary}}
 
 \end{document}

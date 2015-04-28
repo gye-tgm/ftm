@@ -1,9 +1,35 @@
 \documentclass[12pt, a4paper]{report}
 
+\usepackage{color}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{subfiles}
 \usepackage{parskip} 
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,               
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=lrtb,
+    aboveskip=2\parskip,
+    belowskip=2\parskip
+}
+ 
+\lstset{style=mystyle}
+
+\newcommand{\mainfile}{}
 
 \title{FT Matura Portfolio}
 \author{Gary Ye}
@@ -23,11 +49,13 @@
 
 \chapter{Implementation}
 
-\subfile{flask}
+\subfile{../flask/flask}
 
 % \subfile{python}
 % \subfile{sphinx}
 % \subfile{testing}
 
+\bibliographystyle{ieeetr}
+\bibliography{../primary}
 
 \end{document}

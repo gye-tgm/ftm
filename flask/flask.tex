@@ -32,7 +32,7 @@ The \lstinline|test/| directory should actually be very obvious,
 however, it's important to note that the test files all should begin
 with the same prefix, such as \lstinline|test_|, so that we can run
 all tests that begin with \lstinline|test_| with one simple matching
-pattern:
+pattern \lstinline|test_*|: 
 
 \begin{lstlisting}
 test/
@@ -278,6 +278,7 @@ Let's consider the implementation of the following \lstinline|User|
 class: 
 
 \begin{lstlisting}
+\label{code:user}
 from app.data import CRUDMixin, db
 from app.models import SocialMediaAccount
 from app.models.post import Post
@@ -321,25 +322,50 @@ authentication, as we will rather focus on the so famous
 \lstinline|db.Model| and the \lstinline|CRUDMixin| class that we have
 just declared.
 
-There are some crucial facts that must be listed down: 
+There are some crucial facts that must be considered during the
+implementation of the model classes:
+
 \begin{itemize}
   \item \lstinline|__tablename__| is the tablename that we will also
     find in the database. Having this attribute is
     \textbf{obligatory}. 
-  \item Normally, every table must also have a primary key, however,
+  \item Normally, every table must also have a \textbf{primary key}, however,
     by inheriting from the convenient \lstinline|CRUDMixin| class, we
     also inherit a very common \lstinline|id| primary key. 
+  \item Each model class that inherits from \lstinline|db.Model|
+    is essentially just a table in the database. 
 \end{itemize}
+
+Details on how to have relationships such as inheritance, one-to-many,
+many-to-many, etc., will be considered in Sections
+\ref{sec:relationships}, \ref{sec:onetomany}, \ref{sec:manytomany},
+\ref{sec:inheritance}. (Hint: CTRL+F might come handy) 
 
 We will come back to this code later on, as there are some undiscussed
 methods which are more useful for the authentication and authorization
-part, as seen in section \ref{sec:auth}. Hey, that's the next one!
+part, as seen in section \ref{sec:auth}.
+
+\subsubsection{Relationships}
+\label{sec:relationships}
+
+\subsubsection{One-To-Many}
+\label{sec:onetomany}
+
+\subsubsection{Many-To-Many (Association Object)}
+\label{sec:manytomany}
+
+\subsubsection{Inheritance}
+\label{sec:inheritance}
 
 \subsection{Authentication and Authorization (Login)}
 \label{sec:auth}
 
 In this section we will discuss how to setup a simple login system
 with the \lstinline|Flask-Login| module. 
+
+The code of the user is already seen in \ref{lst:user.py}. 
+
+
 
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}

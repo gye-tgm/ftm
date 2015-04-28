@@ -1,0 +1,102 @@
+\documentclass[../main/main.tex]{subfiles}
+
+\begin{document}
+
+\section{Flask}  
+
+In the following section we will see how we can quickly set up a fully
+functional Flask project with the speed that the developers are
+promising.
+
+We assume that the required Python modules are already globally
+installed, which is generally considered as bad practice, however,
+without further ado, let's get started.
+
+\subsection{Fundamental Setup}
+
+\subsubsection{Project Structure}
+
+In this section we will vaguely explain how the project should be
+roughly structured.
+
+\begin{lstlisting}
+ftmatura/
+  app/  [see below]
+  tests/ [see below]
+  app.db
+  config.py
+  run.py
+\end{lstlisting}
+
+The \lstinline|test/| directory should actually be very obvious,
+however, it's important to note that the test files all should begin
+with the same prefix, such as \lstinline|test_|, so that we can run
+all tests that begin with \lstinline|test_| with one simple matching
+pattern:
+
+\begin{lstlisting}
+test/
+  test_base.py
+  test_user.py
+  test_login.py
+  ...
+\end{lstlisting}
+
+In \lstinline|config.py| we will insert, as the name suggests, the
+configuration of the application. 
+
+\lstinline|run.py| is basically a script that will start the
+application with or without the debug mode, depending on whether we
+are using it for the production environment. 
+
+The code that powers the software should be located inside the app/
+directory:
+
+\begin{lstlisting}
+app/
+  models/
+  models/__init__.py
+  models/model1.py
+  models/model2.py
+  templates/ [see below]
+  static/ 
+  page1/
+  page2/ 
+  utility1.py
+  utility2.py
+\end{lstlisting}
+
+In \lstinline|templates/| we will put the code from the \textit{view}
+(from MVC) component. These are basically HTML files that are fueled
+by the Jinja 2 plugin, a very \textbf{powerful} plugin. 
+
+For each subpage $i$ we will create a \lstinline|page|$_i$ module that
+will contain some basic Python modules, such as \lstinline|views.py|,
+\lstinline|forms.py|; files that contain the logic of the page, which
+will be discussed later on. In the \lstinline|template/| directory we
+will also setup a new directory for only this page; so in the end, the
+template directory can take the following structure: 
+
+\begin{lstlisting}
+template/
+  page1/
+  page2/
+  base.html
+  index.html
+\end{lstlisting}
+
+\begin{lstlisting}
+from os.path import join, dirname, abspath
+
+_cwd = dirname(abspath(__file__))
+
+class BaseConfiguration(object):
+    SECRET_KEY = this-should-be-secret'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + join(_cwd, 'app.db')
+    SQLALCHEMY_ECHO = True
+\end{lstlisting}
+
+
+
+
+\end{document}

@@ -29,3 +29,14 @@
 *.swp
 
 *.pdf
+
+
+# Because of htlatex
+*.4ct
+*.4tc
+*.css
+*.html
+*.idv
+*.lg
+*.tmp
+*.xref

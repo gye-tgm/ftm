@@ -97,7 +97,7 @@ The \lstinline|run.py| is, essentially, the main file, which is
 equivalent to the main class in Java. Here we will merely call the app
 with some debug flags on or off. 
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=run.py, label=lst:run.py]
 #!/usr/bin/env python
 from app import app
 # app.run(debug=True, use_debugger=False, use_reloader=False)
@@ -118,7 +118,7 @@ The file must also be given the execution rights via \lstinline|chmod u+x run.py
 The powerful and flexible \lstinline|config.py| file is Flask's
 biggest asset: 
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=config.py, label=lst:config.py]
 from os.path import join, dirname, abspath
 _cwd = dirname(abspath(__file__))
 
@@ -148,7 +148,7 @@ we declared in section \ref{sec:config.py}. The \lstinline|db| object
 is important for the upcoming sections, as each model will be using
 it implicitly, however, we'll leave it for now first. 
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=app/\_\_init\_\_.py, label=lst:app/init.py]
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -211,7 +211,7 @@ under the same name.
 
 % TODO: more more more!
 
-\subsection{Implementing the Model Classes}
+\subsection{The Model Classes (+Relationships)}
 
 In this section we want to briefly discuss how to implement a single
 model class via the \lstinline|Flask-SQLAlchemy| module. 
@@ -219,9 +219,8 @@ model class via the \lstinline|Flask-SQLAlchemy| module.
 We first declare a helper class that we will put into
 \lstinline|app/data.py|: 
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=app/data.py, label=lst:data.py]
 from app import db
-
 
 class CRUDMixin(object):
     """
@@ -277,8 +276,7 @@ model classes.
 Let's consider the implementation of the following \lstinline|User|
 class: 
 
-\begin{lstlisting}
-\label{code:user}
+\begin{lstlisting}[caption=app/models/user.py, label=lst:user.py]
 from app.data import CRUDMixin, db
 from app.models import SocialMediaAccount
 from app.models.post import Post
@@ -363,9 +361,7 @@ part, as seen in section \ref{sec:auth}.
 In this section we will discuss how to setup a simple login system
 with the \lstinline|Flask-Login| module. 
 
-The code of the user is already seen in \ref{lst:user.py}. 
-
-
+The code of the user is already seen in Listing \ref{lst:user.py}. 
 
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}

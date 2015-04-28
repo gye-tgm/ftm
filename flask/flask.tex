@@ -93,21 +93,114 @@ Matura.
 
 \subsubsection{\lstinline|run.py|}
 
-\subsubsection{config.py}
+The \lstinline|run.py| is, essentially, the main file, which is
+equivalent to the main class in Java. Here we will merely call the app
+with some debug flags on or off. 
+
+\begin{lstlisting}
+#!/usr/bin/env python
+from app import app
+# app.run(debug=True, use_debugger=False, use_reloader=False)
+app.run(debug=True)
+\end{lstlisting}
+
+The one line that is commented out is vital for debugging with the
+IDE, especially for PyCharm, as it turns off some additional features
+that thwart the IDE from debugging with the \lstinline|pdb|. 
+
+The file has a shebang on the first line, which means the first Python
+interpreter that is found in the \lstinline|PATH| gets called. 
+
+The file must also be given the execution rights via \lstinline|chmod u+x run.py|. 
+
+\subsubsection{\lstinline|config.py|}
+\label{sec:config.py}
+The powerful and flexible \lstinline|config.py| file is Flask's
+biggest asset: 
 
 \begin{lstlisting}
 from os.path import join, dirname, abspath
-
 _cwd = dirname(abspath(__file__))
 
 class BaseConfiguration(object):
     SECRET_KEY = this-should-be-secret'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + join(_cwd, 'app.db')
     SQLALCHEMY_ECHO = True
+
+class TestConfiguration(BaseConfiguration):
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 \end{lstlisting}
 
-\bibliographystyle{ieeetr}
-\bibliography{../primary}
+These are some configuration variables that are important for an
+appropriate setup of the SQLite database that we are going to use
+throughout the exam. 
+
+The SQLite database is also extraordinairly powerful, as it can be
+used in the memory, as we can see in the \lstinline|TestConfiguration|
+class. Lightweight and simple to configure, thus perfect for the exam.
+
+\subsubsection{\lstinline|app/__init__.py|}
+
+In this module, we are going to setup from the configuration file that
+we declared in section \ref{sec:config.py}. The \lstinline|db| object
+is important for the upcoming sections, as each model will be using
+it implicitly, however, we'll leave it for now first. 
+
+\begin{lstlisting}
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config.from_object('config.BaseConfiguration')
+
+db = SQLAlchemy(app)
+\end{lstlisting}
+
+\subsection{Blueprints}
+
+Blueprints are essentially sets of operations that will be executed,
+if they are registered into the \lstinline|app|. Here, we will use a
+couple of them, as they increase the degree of modularity and
+flexibility. To be more specific, we will use for each new page a
+single blueprint. 
+
+The registration will be done in the \lstinline|app/__init__.py|
+file. Note that we can also specify the \lstinline|url_prefix|: 
+
+\begin{lstlisting}
+from app.users.views import mod as user_mod
+app.register_blueprint(user_mod, url_prefix='/home')
+\end{lstlisting}
+
+While the \lstinline|app/users/views.py| could have the following
+content:
+
+\begin{lstlisting}
+from flask import Blueprint, render_tmplate
+
+mod = Blueprint('user', __name__, template_folder='templates')
+@mod.route('/')
+def index():
+    return render_template('user/index.html')
+\end{lstlisting}
+
+To sum it up a little bit: for every page, we create a single module
+inside the \lstinline|app/| module, and create a \lstinline|views.py|
+file, in which we will declare the blueprints. 
+
+Note that we can register the blueprints under several names, and not
+just only a single one. 
+
+While developing, it might happen that the \lstinline|url_prefix|
+should be changed, due to an arbitrary reason, then we merely change
+the \lstinline|url_prefix|, instead of every
+\lstinline|@mod.route('/path/to/this/bp')| to something else, which is
+indeed very convenient.
+
+
+% \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}
 
 \end{document}

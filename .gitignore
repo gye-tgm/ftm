@@ -40,3 +40,6 @@
 *.lg
 *.tmp
 *.xref
+
+
+*.lock

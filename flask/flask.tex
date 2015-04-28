@@ -199,6 +199,122 @@ the \lstinline|url_prefix|, instead of every
 \lstinline|@mod.route('/path/to/this/bp')| to something else, which is
 indeed very convenient.
 
+The first parameter in the \lstinline|Blueprint| constructor just
+states the names under which the blueprint can be accessed. Should the
+name be \lstinline|user|, then we can for instance use the handy
+\lstinline|url_for('user.index')| function to get the corresponding
+link to the \lstinline|index()| function of this blueprint. 
+
+However, we must take care that there are no names collisions, which
+means that we can't just register multiple non-identical blueprints
+under the same name. 
+
+% TODO: more more more!
+
+\subsection{Implementing the Model Classes}
+
+In this section we want to briefly discuss how to implement a single
+model class via the \lstinline|Flask-SQLAlchemy| module. 
+
+We first declare a helper class that we will put into
+\lstinline|app/data.py|: 
+
+\begin{lstlisting}
+from app import db
+
+
+class CRUDMixin(object):
+    """
+    Inheriting this class eliminates common code for the fundamental CRUD commands.
+    """
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    @classmethod
+    def create(cls, commit=True, **kwargs):
+        instance = cls(**kwargs)
+        return instance.save(commit=commit)
+
+    @classmethod
+    def get(cls, id):
+        return cls.query.get(id)
+
+    @classmethod
+    def get_or_404(cls, id):
+        return cls.query.get_or_404(id)
+
+    def update(self, commit=True, **kwargs):
+        for attr, value in kwargs.iteritems():
+            setattr(self, attr, value)
+        return commit and self.save() or self
+
+    def save(self, commit=True):
+        db.session.add(self)
+        if commit:
+            db.session.commit()
+        return self
+
+    def delete(self, commit=True):
+        db.session.delete(self)
+        return commit and db.session.commit()  
+\end{lstlisting}
+
+Basically, it just reduces a few lines for each CRUD command, however,
+on a long term, this will reduce the number of code lines, thus the
+developing time, proportionally. 
+
+As we know from SQLAlchemy, every object that we need to insert into
+the database has to be first added from the \lstinline|session|
+object, and then the \lstinline|session| object has to commit the
+session. This might get tedious, especially if 5 hours test timer is
+running in the background.
+
+Additionally, it contains an integer, called \lstinline|id|, as a
+primary key, which happens to be the case in a vast majority of the
+model classes.
+
+Let's consider the implementation of the following \lstinline|User|
+class: 
+
+\begin{lstlisting}
+from app.data import CRUDMixin, db
+from app.models import SocialMediaAccount
+from app.models.post import Post
+from flask.ext.login import UserMixin
+
+ROLE_USER = 0
+ROLE_ADMIN = 1
+
+class User(db.Model, UserMixin, CRUDMixin):
+    __tablename__ = 'user'
+
+    username = db.Column(db.String, unique=True)
+    password = db.Column(db.String)
+    role = db.Column(db.Integer, default=ROLE_USER)
+
+    accounts = db.relationship(SocialMediaAccount, backref='user', lazy='dynamic')
+    posts = db.relationship(Post, backref='user', lazy='dynamic')
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
+
+    def is_valid_password(self, password):
+        # normally you would compare the hash here
+        return self.password == password
+
+    def __repr__(self):
+        return "<User #{:d}>".format(self.id)
+\end{lstlisting}
 
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}

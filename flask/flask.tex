@@ -213,6 +213,7 @@ under the same name.
 
 \subsection{The Model Classes (+Relationships)}
 
+\subsubsection{Simple Declaration}
 In this section we want to briefly discuss how to implement a single
 model class via the \lstinline|Flask-SQLAlchemy| module. 
 
@@ -343,15 +344,48 @@ We will come back to this code later on, as there are some undiscussed
 methods which are more useful for the authentication and authorization
 part, as seen in section \ref{sec:auth}.
 
+Nevertheless, the columns, as seen in the docs of the
+\lstinline|Flas-SQLAlchemy| \cite{mitsuhiko:declare_models}, can have
+the following datatypes: 
+
+\begin{tabular}{ | l | l | l | } \\ \hline
+Integer & an integer & \lstinline|db.Integer| \\ \hline
+String (size) & a string with a maximum length &  \lstinline|db.String(42)|\\ \hline
+Text & some longer unicode text &  \lstinline|db.Text|  \\ \hline
+DateTime & date and time expressed as Python datetime object. & \lstinline|db.DateTime|\\ \hline
+Float & stores floating point values & \lstinline|db.Float| \\ \hline
+Boolean & stores a boolean value & \lstinline|db.Boolean| \\ \hline
+Pickle & Typestores a pickled Python object &  \lstinline|db.Pickle| \\ \hline
+LargeBinary & stores large arbitrary binary data &  \lstinline|db.LargeBinary|\\ \hline
+\end{tabular}
+
+
 \subsubsection{Relationships}
 \label{sec:relationships}
 
-Relationships 
+Relationships are expressed with \lstinline|relationship()|. The
+first paramater can either be the class or just the (string) name of the
+class \cite{mitsuhiko:declare_models}, since one might want to declare
+the class with the foreign key at an uncertain time in the future. 
+
+Let's jump right into the more concrete associations in the following
+sections. 
 
 \subsubsection{One-To-Many}
 \label{sec:onetomany}
 
+If we consider the one single line from \ref{lst:user.py}:
+
 \begin{lstlisting}
+  posts = db.relationship(Post, backref='user', lazy='dynamic')  
+\end{lstlisting}
+
+Then we can obviously spot the relationship that the user can have
+multiple posts. 
+
+The corresponding \lstinline|Post| class follows: 
+
+\begin{lstlisting}[caption=app/models/post.py, label=post.py]
 from app import db
 from app.data import CRUDMixin
 
@@ -360,8 +394,15 @@ class Post(db.Model, CRUDMixin):
 
     content = db.Column(db.String)
     time = db.Column(db.Date)
+
+    # vvv HERE vvv
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+   #  ^^^ HERE ^^^
 \end{lstlisting}
+
+Notice that the post class, which is also the class on the
+\textit{many} side, must have a foreign key of the corresponding user
+class.
 
 \subsubsection{Many-To-Many (Association Object)}
 \label{sec:manytomany}
@@ -404,6 +445,9 @@ class SocialMediaAccount(db.Model, CRUDMixin):
 \end{lstlisting}
 
 \begin{lstlisting}
+from app import db
+from app.models import SocialMediaAccount
+
 class FacebookAccount(SocialMediaAccount):
     __tablename__ = 'fbaccount'
     __mapper_args__ = {'polymorphic_identity': 'fb_account'}

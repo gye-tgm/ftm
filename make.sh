@@ -1,8 +1,10 @@
+out_dir=out
 file=main
 
 if [ -n "$1" ]; then
   file=$1
 fi
 
-mkdir -p out && cd out
+mkdir -p $out_dir && cd $out_dir
 htlatex ../$file/$file.tex
+cat ../custom.css >> ../$out_dir/$file.css

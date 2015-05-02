@@ -261,14 +261,14 @@ class CRUDMixin(object):
 \end{lstlisting}
 
 Basically, it just reduces a few lines for each CRUD command, however,
-on a long term, this will reduce the number of code lines, thus the
-developing time, proportionally. 
+on the long term, this will reduce the number of code lines, thus the
+developing time, proportionally.
 
 As we know from SQLAlchemy, every object that we need to insert into
 the database has to be first added from the \lstinline|session|
 object, and then the \lstinline|session| object has to commit the
 session. This might get tedious, especially if 5 hours test timer is
-running in the background.
+ticking in the background.
 
 Additionally, it contains an integer, called \lstinline|id|, as a
 primary key, which happens to be the case in a vast majority of the
@@ -395,17 +395,27 @@ class Post(db.Model, CRUDMixin):
     content = db.Column(db.String)
     time = db.Column(db.Date)
 
-    # vvv HERE vvv
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-   #  ^^^ HERE ^^^
 \end{lstlisting}
 
 Notice that the post class, which is also the class on the
 \textit{many} side, must have a foreign key of the corresponding user
-class.
+class. Note the following line: 
+
+\begin{lstlisting}
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  
+\end{lstlisting}
+
+This declares the foreign key that is important, as we know from the
+official SQLAlchemy tutorial. 
+
+% One to One + Backrefs
 
 \subsubsection{Many-To-Many (Association Object)}
 \label{sec:manytomany}
+
+Many-to-many relationships are always joined together with an
+association table. This table can be declared like any other table. 
 
 \begin{lstlisting}
 from app import db
@@ -475,7 +485,12 @@ class TwitterAccount(SocialMediaAccount):
 In this section we will discuss how to setup a simple login system
 with the \lstinline|Flask-Login| module. 
 
-The code of the user is already seen in Listing \ref{lst:user.py}. 
+The basic code of the user can already be seen in Listing
+\ref{lst:user.py}. This class inherits from \lstinline|UserMixin|,
+which is a class that is provided and necessitated by the
+\lstinline|Flask-Login| module. 
+
+
 
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}

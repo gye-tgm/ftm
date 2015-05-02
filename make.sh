@@ -6,5 +6,6 @@ if [ -n "$1" ]; then
 fi
 
 mkdir -p $out_dir && cd $out_dir
+bibtex $file
 htlatex ../$file/$file.tex
 cat ../custom.css >> ../$out_dir/$file.css

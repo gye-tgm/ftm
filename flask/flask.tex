@@ -415,6 +415,8 @@ official SQLAlchemy tutorial.
 Many-to-many relationships are always joined together with an
 association table. This table can be declared like any other table. 
 
+% TODO: This must be fixed 
+
 \begin{lstlisting}
 from app import db
 from app.data import CRUDMixin
@@ -438,7 +440,15 @@ class Follow(db.Model, CRUDMixin):
 \subsubsection{Inheritance}
 \label{sec:inheritance}
 
-Some exampolos: 
+If a class needs to be inherited, then the super class must own a so called
+\lstinline|discriminator| that can be of any type (typically string), as this is
+used to discriminate (in a positive way) the different subclasses. 
+
+We must register the discriminator into the \lstinline|__mapper_args__|. 
+
+A social media account can be a FacebookAccount or a TwitterAccount. An example
+will be provided below, as classes with names A, B, and C are the worst
+examples to explain something: 
 
 \begin{lstlisting}
 from app import db
@@ -452,6 +462,10 @@ class SocialMediaAccount(db.Model, CRUDMixin):
     __mapper_args__ = {'polymorphic_on': discriminator}  
 \end{lstlisting}
 
+Now the Facebook and Twitter accounts respectively. In the subclasses, we also
+need to give the discriminator a value by setting the
+\lstinline|__mapper_args__['polymorphic_identity']| variable correspondingly:
+
 \begin{lstlisting}
 from app import db
 from app.models import SocialMediaAccount
@@ -463,7 +477,6 @@ class FacebookAccount(SocialMediaAccount):
     id = db.Column(db.Integer, db.ForeignKey('smaccount.id'), primary_key=True)
     url = db.Column(db.String)
 \end{lstlisting}
-
 
 \begin{lstlisting}
 from app import db

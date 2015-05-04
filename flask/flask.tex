@@ -22,7 +22,7 @@ roughly structured.
 \begin{lstlisting}
 ftmatura/
   app/  [see below]
-  tests/ [see below]
+  test/ [see below]
   app.db
   config.py
   run.py
@@ -46,56 +46,64 @@ In \lstinline|config.py| we will insert, as the name suggests, the
 configuration of the application. 
 
 \lstinline|run.py| is basically a script that will start the
-application with or without the debug mode, depending on whether we
-are using it for the production environment. 
+application with or without the debug mode, depending on whether we are using
+it for the production environment. 
 
-The code that powers the software should be located inside the app/
+The code that powers the software should be located inside the \lstinline|app/|
 directory:
 
 \begin{lstlisting}
 app/
   models/
   models/__init__.py
-  models/model1.py
-  models/model2.py
+  models/user.py
+  models/train.py
+  views/__init__.py
+  views/user.py
+  views/train.py
   templates/ [see below]
   static/ 
-  page1/
-  page2/ 
   utility1.py
   utility2.py
 \end{lstlisting}
 
 In \lstinline|templates/| we will put the code from the \textit{view}
 (from MVC) component. These are basically HTML files that are fueled
-by the Jinja 2 plugin, a very \textbf{powerful} plugin. 
+by the very \textbf{powerful} Jinja 2 plugin.
 
-For each subpage $i$ we will create a \lstinline|page|$_i$ module that
-will contain some basic Python modules, such as \lstinline|views.py|,
-\lstinline|forms.py|; files that contain the logic of the page, which
-will be discussed later on. In the \lstinline|template/| directory we
-will also setup a new directory for only this page; so in the end, the
-template directory can take the following structure: 
+In this example we use the so called \textit{functional structure} that is
+presented in \cite{exploreflask:functional}. As the author assumes that the
+modules are not fully independent from each other, he suggests using the
+\textit{functional structure} during the FT Matura (instead of using the
+divisional structure; more information under \cite{exploreflask:functional}). 
+
+% For each subpage $i$ we will create a \lstinline|page|$_i$ module that
+% will contain some basic Python modules, such as \lstinline|views.py|,
+% \lstinline|forms.py|; files that contain the logic of the page, which
+% will be discussed later on.
+
+In the \lstinline|template/| directory we will also setup a new directory for
+only this page; so in the end, the template directory can take the following
+structure: 
 
 \begin{lstlisting}
 template/
-  page1/
-  page2/
+  user/
+  train/
+  errors/403.html
+  errors/404.html
   base.html
   index.html
 \end{lstlisting}
 
-This idea did not came out of the thin air, however, the developer of
-Flask has unofficially suggested \cite{mitsuhiko:flask} this particular structure, which
-actually makes sense on a second look. This structure is intended for
-middle sized projects, such as the one that will be given in the FT
-Matura. 
+This structure is intended for middle sized projects, such as the one that will
+be given in the FT Matura. 
 
 \subsubsection{\lstinline|run.py|}
 
-The \lstinline|run.py| is, essentially, the main file, which is
-equivalent to the main class in Java. Here we will merely call the app
-with some debug flags on or off. 
+The \lstinline|run.py| is, essentially, the script file that will be executed to
+start the webservice. Here, we will merely call the app with some debug flags
+on or off. 
 
 \begin{lstlisting}[caption=run.py, label=lst:run.py]
 #!/usr/bin/env python
@@ -115,8 +123,8 @@ The file must also be given the execution rights via \lstinline|chmod u+x run.py
 
 \subsubsection{\lstinline|config.py|}
 \label{sec:config.py}
-The powerful and flexible \lstinline|config.py| file is Flask's
-biggest asset: 
+The powerful and flexible \lstinline|config.py| file is one of Flask's
+biggest asset:
 
 \begin{lstlisting}[caption=config.py, label=lst:config.py]
 from os.path import join, dirname, abspath
@@ -141,21 +149,12 @@ The SQLite database is also extraordinairly powerful, as it can be
 used in the memory, as we can see in the \lstinline|TestConfiguration|
 class. Lightweight and simple to configure, thus perfect for the exam.
 
-\subsubsection{\lstinline|app/__init__.py|}
+Configuring from an BaseConfiguration object is simple and can be seen in the
+following line:
 
-In this module, we are going to setup from the configuration file that
-we declared in section \ref{sec:config.py}. The \lstinline|db| object
-is important for the upcoming sections, as each model will be using
-it implicitly, however, we'll leave it for now first. 
-
-\begin{lstlisting}[caption=app/\_\_init\_\_.py, label=lst:app/init.py]
-from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-
+\begin{lstlisting}
 app = Flask(__name__)
 app.config.from_object('config.BaseConfiguration')
-
-db = SQLAlchemy(app)
 \end{lstlisting}
 
 \subsection{Blueprints}
@@ -266,9 +265,8 @@ developing time, proportionally.
 
 As we know from SQLAlchemy, every object that we need to insert into
 the database has to be first added from the \lstinline|session|
-object, and then the \lstinline|session| object has to commit the
-session. This might get tedious, especially if 5 hours test timer is
-ticking in the background.
+object, and then the \lstinline|session| object has to commit the session. This
+might get tedious, especially if a 5 hour timer is ticking in the background.
 
 Additionally, it contains an integer, called \lstinline|id|, as a
 primary key, which happens to be the case in a vast majority of the
@@ -490,7 +488,60 @@ The basic code of the user can already be seen in Listing
 which is a class that is provided and necessitated by the
 \lstinline|Flask-Login| module. 
 
+\subsection{Admin Pages (CRUD)}
 
+An excellent module that generates an admin page under the URI
+\lstinline|/admin| wherein the admin can perform CRUD operations and other
+related operations. 
+
+We will create a customized class that will derive the \lstinline|ModelView|,
+however, this class also makes a small authorization and authentication check. 
+
+\begin{lstlisting}
+admin = Admin()
+admin.init_app(app)
+
+class AuthenticatedModelView(ModelView):
+  def is_accessible(self):
+    return login.current_user.is_authenticated() and login.current_user.role == ROLE_ADMIN
+
+admin.add_view(AuthenticatedModelView(User, db.session, endpoint='myuser'))
+
+\end{lstlisting}
+
+The \lstinline|endpoint| paramter indicates the suffix of the URI under which we
+can access this particular page. For instance, in this code snippet, we can
+access the user CRUD page with \lstinline|/admin/myuser|, otherwise it will use
+the class name, and this might lead to unexpected results. 
+
+In the background it also uses blueprints. 
+
+\subsection{Scheduling}
+
+Using the \lstinline|schedule| module, we can perfectly create timed tasks that
+will be executed in the background. 
+
+Read the \lstinline|schedule| documentation for more options. However, it's very
+important to note that these requests have to be started in
+\lstinline|@app.before_request|, and it's important to set the
+\lstinline|use_reloader=False| in \lstinline|run.py|, otherwise it will start
+the schedulers twice. 
+
+\begin{lstlisting}
+def configure_hook(app):
+    twcr = TwitterCrawler()
+
+    def run_schedule():
+        while 1:
+            schedule.run_pending()
+            time.sleep(1)
+
+    @app.before_request
+    def before_request():
+        schedule.every(1).minute.do(twcr.crawl_all)
+        t = Thread(target=run_schedule)
+        t.start()
+\end{lstlisting}
 
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}

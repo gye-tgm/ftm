@@ -2,8 +2,7 @@ Build with `./make.sh $NAME`
 
 
 TODO:
-
-uml: copy paste what i got
-design patterns: as well
-python: abstract classes, ... 
+Python: abstract classes
+Flask: Flask-Login, principal, WTForms, Jinja2
+SQLAlchemy Mapping: everything!!
 

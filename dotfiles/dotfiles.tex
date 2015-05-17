@@ -13,6 +13,15 @@ sudo dpkg-reconfigure keyboard-configuration
 
 Afterwards we should reboot the system. 
 
+\subsubsection{PATH}
+
+This must be done for sphinx and so on. Best put it in the \lstinline|.bashrc|
+file. 
+
+\begin{lstlisting}
+export PATH=$PATH:~/.local/bin
+\end{lstlisting}
+
 \subsubsection{Performance Optimization}
 
 Disable Compositing under Window Tweaks Manager. 

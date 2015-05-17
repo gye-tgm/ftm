@@ -366,9 +366,7 @@ from flask.ext.login import login_user, login_required, logout_user
 
 from app.models import User
 
-
 mod = Blueprint('user', __name__, template_folder='templates')
-
 
 @mod.route('/')
 def index():
@@ -937,6 +935,81 @@ should be suffice.
 </div>
 
 {% endblock %}
+\end{lstlisting}
+
+\subsubsection{\lstinline|login.html|}
+
+Since we have such a comprehensive \lstinline|base.html| file as a base, we can
+just extend it and gain a page with the same layout as the parent. In the
+following code snippet, we can see how quickly a login form can be generated via
+WTForms. 
+
+\begin{lstlisting}
+{% extends "base.html" %}
+{% block content %}
+    {{ super() }}
+    {% import "bootstrap/wtf.html" as wtf %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-4">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+\end{lstlisting}
+
+\subsection{Logging}
+
+At the very beginning of the program, we must also set the settings of the
+logging module.
+
+\begin{lstlisting}
+logging.basicConfig(filename='flask.log', level=logging.INFO)
+\end{lstlisting}
+
+Then we can use the \lstinline|app| to log the behavior of the program:
+
+\begin{lstlisting}
+app.logger.info/warning/error(message)
+\end{lstlisting}
+
+\subsection{Authorization}
+
+This is a small, lightweight and compact way to handle user authorizations. This
+is a code snippet from the official Flask code snippets \cite{flask:auth}.
+
+\begin{quote} This snippet is pretty simple. You just need to replace
+  get_current_user_role() with however you get the user's current role and
+  error_response() with however you want to notify the user that they are not
+  logged in. After you do that, you should be good to go \cite{flask:auth}.
+\end{quote}
+
+\begin{lstlisting}
+def requires_roles(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if get_current_user_role() not in roles:
+                return error_response()
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+\end{lstlisting}
+
+\begin{quote}
+Usage is equally as simple as the snippet itself. This is just a decorator that
+you pass the required roles into. The required roles can be any type of object,
+not just strings. Do note that if you use a login extension such as Flask-Login,
+you should call it after the login_required (or equivalent) decorator
+\cite{flask:auth}.
+\end{quote}
+
+\begin{lstlisting}
+@app.route('/user')
+@required_roles('admin', 'user')
+def user_page(self):
+    return "You've got permission to access this page."
 \end{lstlisting}
 
 

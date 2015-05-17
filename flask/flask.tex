@@ -748,6 +748,105 @@ def configure_hook(app):
         t.start()
 \end{lstlisting}
 
+\subsection{Bootstrap GUI}
+
+The bootstrap GUI can be applied if our base file, which we will definitely
+declare, extends from the given "bootstrap/base.html" file. 
+
+Jinja is actually very simple, but if something's wrong, the documentation is
+also sufficient for our requirements.  
+
+\subsubsection{Macros}
+
+These are very important macros that can be used to render all kind of forms. It
+also renders the error messages, should there be any. 
+
+\begin{lstlisting}
+{% macro render_field(field) %}
+    <div class="form_field">
+        {{ field.label(class="label") }}
+        {% if field.errors %}
+            {% set css_class = 'has_error ' + kwargs.pop('class', '') %}
+            {{ field(class=css_class, **kwargs) }}
+            <ul class="errors">{% for error in field.errors %}
+                <li>{{ error|e }}</li>{% endfor %}</ul>
+        {% else %}
+            {{ field(**kwargs) }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_link(url, text) %}
+    <a href="{{ url_for(url) }}">{{ text }}</a>
+{% endmacro %}
+\end{lstlisting}
+
+\subsubsection{\lstinline|base.html|}
+
+Every file in our projects needs a base, thus the file that is provided below
+should be suffice. 
+
+\begin{lstlisting}
+{% extends "bootstrap/base.html" %}
+{% from "forms/macros.html" import render_link %}
+
+{% block title %} Choose a title! {% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">
+                    Track-It
+                </a>
+            </div>
+
+            <div class="navbar-left">
+                <p class="navbar-text">
+                    {{ render_link("track.index", "Home") }}
+                </p>
+                <p class="navbar-text">
+                    <a href="{{ url_for("track.me") }}">Me</a>
+                </p>
+                {% if current_user.role == 1 %}
+                    <p class="navbar-text">
+                        <a href="/admin">Admin</a>
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="navbar-right">
+                {% if current_user.is_authenticated() %}
+                    <p class="navbar-text">
+                        Signed in as {{ current_user.username }}
+                    </p>
+                    <p class="navbar-text">
+                        {{ render_link("user.settings", "Settings") }}
+                    </p>
+                    <p class="navbar-text">
+                        {{ render_link("user.logout", "Logout") }}
+                    </p>
+
+                {% else %}
+                    <p class="navbar-text">
+                        {{ render_link("user.login", "Login") }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    {% import "bootstrap/utils.html" as utils %}
+    {{ utils.flashed_messages() }}
+</div>
+
+{% endblock %}
+\end{lstlisting}
+
+
 % \bibliographystyle{ieeetr}
 % \ifcsdef{mainfile}{}{\bibliography{../primary}}
 

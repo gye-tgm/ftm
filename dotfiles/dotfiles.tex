@@ -1,0 +1,73 @@
+\documentclass[../main/main.tex]{subfiles}
+\begin{document}
+\section{Linux Configuration}
+\subsection{xubuntu}
+
+\subsubsection{Keyboard Layout}
+
+Setting the keyboard to the US English Layout (Macintosh):
+
+\begin{lstlisting}
+sudo dpkg-reconfigure keyboard-configuration
+\end{lstlisting}
+
+Afterwards we should reboot the system. 
+
+\subsubsection{Performance Optimization}
+
+Disable Compositing under Window Tweaks Manager. 
+
+
+\subsection{\lstinline|.vimrc|}
+\begin{lstlisting}
+" https://gist.github.com/rocarvaj/2513367
+sy on
+set autoindent
+set smartindent
+set tabstop=2
+set shiftwidth=2
+set expandtab
+set number
+
+filetype plugin indent on
+
+command Latex !pdflatex %
+
+" http://cloudhead.io/2010/04/24/staying-the-hell-out-of-insert-mode/
+inoremap kj <Esc>
+" ignores the arrow keys 
+inoremap <Left>  <NOP>
+inoremap <Right> <NOP>
+inoremap <Up>    <NOP>
+inoremap <Down>  <NOP>
+
+nmap <Space> i_<Esc>r
+\end{lstlisting}
+
+\subsection{\lstinline|.tmux.conf|}
+
+\begin{lstlisting}
+# use UTF8
+set -g utf8
+set-window-option -g utf8 on
+
+# We set C-o as the meta key. 
+unbind C-b
+set -g prefix C-o
+bind C-o send-prefix
+
+# Using the right color set. 
+set -g default-terminal "screen-256color"
+set-option -g status on
+set-option -g status-interval 2
+set-option -g status-utf8 on
+set-option -g status-justify "centre"
+set-option -g status-left-length 90
+set-option -g status-right-length 90
+
+# http://stackoverflow.com/questions/6041178/keep-the-windows-name-fixed-in-tmux
+set-option -g allow-rename off
+\end{lstlisting}
+
+
+\end{document}

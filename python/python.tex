@@ -1,0 +1,34 @@
+\documentclass[../main/main.tex]{subfiles}
+
+\begin{document}
+
+\section{Python}
+
+\subsection{Basics}
+
+Can be found in the official Python Documentation. 
+
+\subsection{\lstinline|setup.py|}
+
+A basic \lstinline|setup.py| file is shown below. This resemebles the makefile
+and uses the Python \lstinline|setuptools| package. 
+
+\begin{lstlisting}
+from setuptools import setup, find_packages
+setup(
+    name='Trackit',
+    version='0.1',
+    author='Gary Ye',
+    packages=find_packages(),
+    test_suite='tests'
+    )
+\end{lstlisting}
+
+We set the default \lstinline|test_suite| as the root directory of the project,
+i.e. if the user enters \lstinline|python setup.py test| then all tests in the
+\lstinline|tests| directory will be executed. 
+
+However, the user can also use the \lstinline|-s| option to select particular
+test suites, e.g. \lstinline|python setup.py test -s tests.login|. 
+
+\end{document}
